@@ -32,9 +32,10 @@ X = [ones(m, 1) X];
 
 
 
+probability_of_belonging = round(sigmoid(all_theta*X').*100)./100;
+[maximum_value, index_of_max] = max(probability_of_belonging);
 
-
-
+p = index_of_max;
 
 % =========================================================================
 
