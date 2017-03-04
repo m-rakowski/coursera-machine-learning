@@ -20,9 +20,9 @@ plot(X(find(y==2)',1),X(find(y==2)',2),'.k','markerSize',12);
 % initialize constants
 n = size(X,2);
 lambda=1;
-initial_theta = [0 0 0]';
+initial_theta = zeros(n+1,1);
 options = optimset('GradObj', 'on', 'MaxIter', 50);
-number_of_classes = 3;
+number_of_classes = length(unique(y));
 thetas = zeros(number_of_classes,n+1);
 
 
