@@ -1,4 +1,4 @@
-function [all_theta] = oneVsAll(X, y, num_labels, lambda)
+function [thetas] = oneVsAll(X, y, num_labels, lambda)
 %ONEVSALL trains multiple logistic regression classifiers and returns all
 %the classifiers in a matrix all_theta, where the i-th row of all_theta 
 %corresponds to the classifier for label i
@@ -7,27 +7,25 @@ function [all_theta] = oneVsAll(X, y, num_labels, lambda)
 %   in a matrix all_theta, where the i-th row of all_theta corresponds 
 %   to the classifier for label i
 
-% Some useful variables
-m = size(X, 1);
+% initialize constants
 n = size(X, 2);
+initial_theta = zeros(n+1,1);
+options = optimset('GradObj', 'on', 'MaxIter',50);
+number_of_classes = length(unique(y));
+thetas = zeros(number_of_classes,n+1);
 
-% You need to return the following variables correctly 
-all_theta = zeros(num_labels, n + 1);
+X = [ones(size(X,1),1) X];
 
-% Add ones to the X data matrix
-X = [ones(m, 1) X];
 
-initial_theta = zeros(n + 1, 1);
-     
-% Set options for fminunc
-options = optimset('GradObj', 'on', 'MaxIter', 100);
- 
-for i = 0:num_labels-1
+% calculate best thetas for each class of points
+% so that later we can use them to make predictions 
+for i = 0:number_of_classes-1
 
     thetas(i+1,:) = fmincg (@(t)(lrCostFunction(t, X, y==i , lambda)),
     initial_theta,
     options)';
     
 end
+
 
 end
