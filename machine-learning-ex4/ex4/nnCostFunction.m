@@ -30,6 +30,10 @@ J = 0;
 Theta1_grad = zeros(size(Theta1));
 Theta2_grad = zeros(size(Theta2));
 
+y_full = zeros(m,num_labels);
+for j=1:m
+  y_full(j,y(j))=1;
+end
 % ====================== YOUR CODE HERE ======================
 % Instructions: You should complete the code by working through the
 %               following parts.
@@ -39,6 +43,75 @@ Theta2_grad = zeros(size(Theta2));
 %         cost function computation is correct by verifying the cost
 %         computed in ex4.m
 %
+
+delta3 = zeros(m,num_labels);
+delta2 = zeros(m,hidden_layer_size);
+delta1 = zeros(m,input_layer_size);
+
+%DELTA1 = zeros(hidden_layer_size,input_layer_size);
+%DELTA2 = zeros(num_labels, hidden_layer_size);
+
+DELTA1 = zeros(size(Theta1));
+DELTA2 = zeros(size(Theta2));
+
+j_first_sum = 0;
+for i = 1:m
+  a1 = X(i,:)'; a1 = [1; a1];
+  a2 = sigmoid(Theta1*a1); a2 = [1; a2];
+  a3 = sigmoid(Theta2*a2);
+  
+  j_first_sum += sum(y_full(i,:)'.*log(a3)+(1-y_full(i,:)').*log(1-a3));
+  
+  
+  %%%%%%%%temp
+  %size(a2)
+  %26 x 1
+  %size(a3)
+  %10 x 1
+  %break;
+  
+  %delta3   10 x 1
+  %a2(2:size(a2))' 1 x 25
+  %10 x 25
+  
+  %DELTA1 += delta2 * a1'
+  %delta2   25 x 1
+  %a1(2:size(a1))'  1 x 400
+  %25 x 400
+  
+  
+  
+  %%%%%%%%/temp
+  
+  delta3(i,:) = (a3 - y_full(i,:)')';
+  delta2(i,:) = (Theta2(:,2:size(Theta2,2))'*delta3(i,:)'.*a2(2:size(a2)).*(1-a2(2:size(a2))))';
+  delta1(i,:) = (Theta1(:,2:size(Theta1,2))'*delta2(i,:)'.*a1(2:size(a1)).*(1-a1(2:size(a1))))';
+
+  DELTA2 += delta3(i,:)' * a2';
+  DELTA1 += delta2(i,:)' * a1';
+  
+end
+
+
+j_second_sum = sum((Theta1(:,2:size(Theta1,2)).^2)(:))+sum((Theta2(:,2:size(Theta2,2)).^2)(:));
+
+J_part1 = -1/m * j_first_sum;
+J_part2 = lambda/2/m*j_second_sum;
+
+J = J_part1 + J_part2;
+
+
+Theta1_grad = 1/m*(DELTA1 + lambda .* Theta1);
+Theta1_grad(:,1) = 1/m*DELTA1(:,1);
+
+Theta2_grad = 1/m*(DELTA2 + lambda .* Theta2);
+Theta2_grad(:,1) = 1/m*DELTA2(:,1);
+
+
+
+% Unroll gradients
+grad = [Theta1_grad(:) ; Theta2_grad(:)];
+
 % Part 2: Implement the backpropagation algorithm to compute the gradients
 %         Theta1_grad and Theta2_grad. You should return the partial derivatives of
 %         the cost function with respect to Theta1 and Theta2 in Theta1_grad and
@@ -78,14 +151,9 @@ Theta2_grad = zeros(size(Theta2));
 
 
 
-
-
 % -------------------------------------------------------------
 
 % =========================================================================
-
-% Unroll gradients
-grad = [Theta1_grad(:) ; Theta2_grad(:)];
 
 
 end
