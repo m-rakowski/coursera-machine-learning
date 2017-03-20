@@ -21,16 +21,12 @@ grad = zeros(size(theta));
 %
 
 
-%J = 1/2/m*(sum((X*theta-y).^2)+lambda*sum(theta.^2));
-%grad(1) = 1/m*sum(X*theta-y);
-%grad = 1/m*sum(X'*(X*theta-y)) - lambda/m*theta;
-  
 
+J = 1/2/m*sum((X*theta-y).^2) + lambda/2/m * sum(theta(2:end).^2);
 
-
-
-
-
+grad    = 1/m * X'*(X*theta-y) + lambda/m * theta;
+%grad(1) = (1/m * X'*(X*theta-y))(1); %this works but it's a horrible hack piggy-backing on the previous implementation
+grad(1) = 1/m * sum(X*theta-y);
 
 
 % =========================================================================
